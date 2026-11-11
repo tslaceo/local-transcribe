@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+build/
+dist/
+
+# uv virtualenv
+.venv/
+
+# Secrets: HF_TOKEN lives here, never in the repo.
+.env
+
+# Pipeline artefacts and recordings live outside version control.
+*.m4a
+*.wav
+*.mp4
+*.webm
+*.mp3
+work/
+runs/
+
+# Belt and braces: a mis-named env file (env.env, .env.local, prod.env) must
+# never be committable either. Windows editors refuse dot-leading names and
+# quietly produce these.
+*.env
+.env.*
+
+# The template is the one env file that belongs in the repository.
+!.env.example
