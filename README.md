@@ -138,12 +138,14 @@ reading.
 
 One 114-minute recording, large-v3, speakers on:
 
-| Machine | End to end | By stage |
-|---|---|---|
-| RTX 4090 | about 5 min | detection, recognition, alignment 172 s; diarization and gapfill 91 s |
-| i9-13900K, no GPU | 68.5 min | recognition 36, alignment 6, diarization 20, gapfill 6.5 |
+| Machine | End to end | Detection, recognition, alignment | Diarization, gap filling |
+|---|---|---|---|
+| RTX 4090 | about 5 min | 2.9 min | 1.5 min |
+| i9-13900K, no GPU | 68.5 min | 42 min | 26 min |
 
-On a CPU that is about 0.6 of the recording's length.
+On the CPU the stages were timed one by one: recognition 36 min, alignment 6 min,
+diarization 20 min, gap filling 6.5 min. On the GPU the log only separates the two groups in
+the table. On a CPU the whole run is about 0.6 of the recording's length.
 
 One fix made the CPU figure possible. silero-vad calls `torch.set_num_threads(1)` when it is
 imported, for the whole process, so alignment and diarization ran on one core: 198 s and
