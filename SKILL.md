@@ -1,6 +1,6 @@
 ---
 name: local-transcribe
-description: Use when a long recording (meeting, lecture, interview, call) has to be transcribed on the local machine with speaker labels, when a Whisper or WhisperX transcript has holes, repeated lines, invented phrases or text in the wrong language, when the speech mixes two languages, or when a transcription run on a machine without an NVIDIA GPU looks hung or far too slow.
+description: Use when a long recording, audio or video (meeting, lecture, interview, call, live or pre-recorded), has to be transcribed on the local machine with speaker labels, when a Whisper or WhisperX transcript has holes, repeated lines, invented phrases or text in the wrong language, when the speech mixes two languages, or when a transcription run on a machine without an NVIDIA GPU looks hung or far too slow.
 ---
 
 # Local transcription of long, messy recordings
@@ -31,7 +31,7 @@ Run commands from any folder as `uv run --project <this folder> local-transcribe
 
 ## The run
 
-1. `ffmpeg -i IN -ac 1 -ar 16000 -c:a pcm_s16le X.wav`
+1. `ffmpeg -i IN -vn -ac 1 -ar 16000 -c:a pcm_s16le X.wav` (IN is audio or video).
 2. `langs X.wav`: `--lang` is the language that wins most windows.
 3. A slice first: `ffmpeg -ss 600 -t 300 -i X.wav slice.wav`, then `transcribe slice.wav`.
    It times the machine and proves the token. A run saves nothing until it ends, and
@@ -50,6 +50,15 @@ Run commands from any folder as `uv run --project <this folder> local-transcribe
 8. Doubtful spots: `redecode X.wav --at 0:53:50 --langs ru,en --prompt "names, terms"`.
 9. Corrections: `fix X.txt fixes.json`. Every fix states how many times it must match, so
    none is lost silently and none lands twice.
+
+## Video recordings
+
+A recorded lecture or a screen recording of a call goes through the same run, and usually
+needs less repair than a room. Use the picture as the check for names, numbers and terms.
+No slide deck? Cut the slides out of the video yourself:
+`ffmpeg -i IN -vf fps=1/10 frames/%04d.png` (frame N is about (N-1)*10 s in), then look at
+the frames. Two identical neighbours are not proof of one slide: check the speech between
+them, because a slide shown briefly between two samples is lost that way.
 
 ## How long (one 114-minute recording, large-v3)
 

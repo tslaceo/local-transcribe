@@ -1,8 +1,10 @@
 # local-transcribe
 
-Speech-to-text with speaker labels for long, messy recordings, on your own machine. Built
-for phone-on-the-table audio: one or two hours, a room, people who switch language in the
-middle of a sentence.
+Speech-to-text with speaker labels for long recordings, on your own machine. It was built
+on the hardest case, a phone on the table in a room: one or two hours, distant voices,
+people who switch language in the middle of a sentence. Recorded lectures, screen
+recordings of calls and other clean audio go through the same commands and need less of the
+repair.
 
 It is WhisperX (large-v3, word alignment, pyannote diarization) with the parts that turned
 out to be missing once the transcripts were actually read: filling the holes the voice
@@ -70,6 +72,26 @@ From another folder: `uv run --project <this folder> local-transcribe ...`.
 gap filling carry `filled: true` and no speaker. The last line `transcribe` prints is
 `wrote X: N segments, C min, with speaker labels; gapfill added K, speech covered A -> B of
 C min`: A before gap filling, B after, C the whole recording, silences included.
+
+## Recordings with video
+
+`ffmpeg` takes the audio straight out of a video file, so a recorded lecture or a screen
+recording of a call goes through the same commands.
+
+The picture is the best check there is for what the model gets wrong: names, numbers and
+terms are usually on the slides. If there is no slide deck, cut the slides out of the
+video. There is no code for that here, and none is needed: an agent that can look at images
+does it well by itself.
+
+```
+ffmpeg -i lecture.mp4 -vn -ac 1 -ar 16000 -c:a pcm_s16le rec.wav
+ffmpeg -i lecture.mp4 -vf fps=1/10 frames/%04d.png     # a frame every 10 s: frame N is about (N-1)*10 s in
+```
+
+Scene detection (`-vf "select='gt(scene,0.2)'" -fps_mode vfr`) gives fewer frames, but
+never the first slide, and it misses a slide that changes little. When two neighbouring
+frames are identical, check the speech between them before calling it one slide: a slide
+shown briefly between two samples is lost that way.
 
 ## Why each part exists
 
